@@ -7,9 +7,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  azureSubscription: 'AZ-RG-Acme'
-  appName: 'acme-frutas-back'
-  resourceGroup: 'acme'
+  azureSubscription: 'AZ-RG-Frutas'
+  appName: 'frutas'
+  resourceGroup: 'Frutas'
   nodeVersion: '22.x'
 
 steps:
