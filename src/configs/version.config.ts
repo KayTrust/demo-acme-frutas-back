@@ -1,5 +1,4 @@
-export default () => {
-    return Object.freeze({
-        VERSION: "0.0.1",
-    });
-}
+
+export default () => ({
+  APP_VERSION: "0.1.0"
+})
