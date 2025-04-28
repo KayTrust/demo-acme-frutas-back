@@ -1,5 +1,5 @@
 export default () => {
-  const { PORT, ORIGINS, NODE_ENV = 'production' } = process.env;
+  const { PORT, ORIGINS, FORCE_HTTPS, NODE_ENV = 'production' } = process.env;
 
   const ORIGINS_STR = ORIGINS ?? '';
 
@@ -10,5 +10,6 @@ export default () => {
       .filter((origin) => origin),
     NODE_ENV,
     IS_PRODUCTION: NODE_ENV === 'production',
+    FORCE_HTTPS: FORCE_HTTPS ? FORCE_HTTPS.toLowerCase().trim() == 'true' || !!parseInt(FORCE_HTTPS) || (typeof FORCE_HTTPS=="boolean" && FORCE_HTTPS) : false
   };
 };

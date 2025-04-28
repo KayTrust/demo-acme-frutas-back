@@ -12,7 +12,8 @@ export const concatRoutes = (...routes: string[]) => {
 };
 
 export function siteUrl(req: Request, ...routes: string[]) {
-  return `${req.protocol}://${req.host}` + concatRoutes(req.baseUrl, ...routes);
+  const protocol = (req as ForceProtocolHttps<Request>).force_protocol_https ? 'https' : req.protocol;
+  return `${protocol}://${req.host}` + concatRoutes(req.baseUrl, ...routes);
 }
 
 export function generarHash(texto: string, algoritmo = 'sha256') {
