@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Column, Entity, Unique } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 'verify' })
 export class Verify extends BaseEntity {
@@ -7,10 +7,10 @@ export class Verify extends BaseEntity {
   name: string;
 
   @Column()
-  did: string;
+  email: string;
 
   @Column()
-  email: string;
+  did: string;
 
   @Column('text')
   vpHash: string;

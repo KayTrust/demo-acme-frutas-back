@@ -10,8 +10,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { resolve } from 'path';
 import { EvalHttpsMiddleware } from './eval-https/eval-https.middleware';
-import { AppDataSource } from './database/app-data-source';
+// import { AppDataSource } from './database/app-data-source';
 import { Verify } from './verifier/entities/verify.entity';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -20,29 +21,30 @@ import { Verify } from './verifier/entities/verify.entity';
       load: CONFIGS_LIST_FOR_LOAD,
     }),
     IssuerModule,
-    TypeOrmModule.forRoot({
-      ...AppDataSource.options,
-      autoLoadEntities: true,
-      // useFactory: () => {
-      //   return {
-      //     type: 'sqlite',
-      //     database: resolve('database/app.db'),
-      //     entities: [Verify],
-      //     migrations: [resolve('dist/migrations/*.js')],
-      //     synchronize: false,
-      //     logging: true,
-      //     migrationsRun: true,
-      //     autoLoadEntities: true,
-      //   }
-      // },
-      // dataSourceFactory: async (options) => {
-      //   const dataSource = await new DataSource(options!).initialize();
-      //   console.log('Data Source has been initialized!');
-      //   return dataSource;
-      // },
+    TypeOrmModule.forRootAsync({
+      // ...AppDataSource.options,
+      // autoLoadEntities: true,
+      useFactory: () => {
+        return {
+          type: 'sqlite',
+          database: resolve('database/app.db'),
+          entities: [Verify],
+          migrations: [resolve('dist/migrations/*.js')],
+          synchronize: false,
+          logging: true,
+          migrationsRun: true,
+          autoLoadEntities: true,
+        }
+      },
+      dataSourceFactory: async (options) => {
+        const dataSource = await new DataSource(options!).initialize();
+        console.log('Data Source has been initialized!');
+        return dataSource;
+      },
     }),
     AuthModule,
     VerifierModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
