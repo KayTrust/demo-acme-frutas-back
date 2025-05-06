@@ -58,6 +58,23 @@ export class IssuerService {
     return `${base_issuer_uri}/${issuer_name}`;
   }
 
+  getCustomDisplayVcMelon() {
+    return {
+      "locale": "en-US",
+      "card": {
+        "title": "Bachelor's Degree",
+        "issuedBy": "Melón University",
+        "backgroundColor": "#f8f6ef",
+        "textColor": "#012a2d",
+        "logo": {
+          "uri": "https://frutas.demo.kaytrust.id/images/logo-acme-university.png",
+          "description": "Melón University Logo"
+        },
+        "description": "Blockchain Technologies"
+      },
+    }
+  }
+
   getMelonOpenIdCredentialIssuerWellKnown(
     base_issuer_uri: string,
   ): OpenIdCredentialIssuerMetadata {
@@ -76,6 +93,7 @@ export class IssuerService {
         format: 'jwt_vc',
         id: 'AcmeAccreditationJWTVC',
         types: ['VerifiableCredential', 'AcmeAccreditation'],
+        display: this.getCustomDisplayVcMelon() as any
       },
     ];
 
@@ -119,9 +137,9 @@ export class IssuerService {
             "name": "Melon University"
           },
           "@type": "Course",
-          "name": "Blockchain Technologies and their Application in the Real World",
+          "name": "Bachelor's Degree in Blockchain Technologies",
           "about": "Web3",
-          "description": "A course on Blockchain Technologies, tokens, networks and more"
+          "description": "An intensive course on Blockchain Technologies, tokens, networks and more"
         },
         "@type": "Person",
         "name": name,
@@ -144,7 +162,7 @@ export class IssuerService {
             "AcmeAccreditation"
           ],
           "trust_framework": {
-            "name": "Acme University",
+            "name": "Melón University",
             "type": "Accreditation",
             "uri": "TIR link towards accreditation"
           }

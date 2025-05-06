@@ -10,6 +10,8 @@ import { createPayloadVCV1, Openid4VCIErrors, createJWTVc, verifyJwtProof } from
 import { IssuerErrorCode, IssuerErrors } from './constants/issuer-errors';
 import { Public } from 'src/auth/decorators/public-auth.decorator';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { Resolver } from 'did-resolver'
+import { getResolver } from '@kaytrust/did-ethr';
 
 @Controller('issuer')
 export class IssuerController {
@@ -17,7 +19,7 @@ export class IssuerController {
 	private readonly logger = new Logger(IssuerController.name);
   constructor(
     private readonly issuerService: IssuerService,
-    private readonly configService: ConfigService<ConfigEnvVars>,
+    private readonly configService: ConfigService<ConfigEnvVars, true>,
   ) {
 
   }
@@ -111,7 +113,9 @@ export class IssuerController {
     if (request.proof) {
       if (request.proof.proof_type == "jwt") {
         const audience = this.issuerService.getIssuerUri(base_url, issuer_name)
-        user_did = await verifyJwtProof(request.proof.jwt, {audience})
+        const networks = this.configService.get("networks", {infer: true});
+        const resolver = new Resolver({...getResolver({networks})})
+        user_did = await verifyJwtProof(request.proof.jwt, {audience, resolver})
       }
     }
 
