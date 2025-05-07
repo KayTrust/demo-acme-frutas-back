@@ -13,6 +13,10 @@ import { EvalHttpsMiddleware } from './eval-https/eval-https.middleware';
 // import { AppDataSource } from './database/app-data-source';
 import { Verify } from './verifier/entities/verify.entity';
 import { SocketModule } from './socket/socket.module';
+import { LoggerModule } from './logger/logger.module';
+import { CustomLoggerService } from './logger/custom-logger.service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor } from './logger/logger.interceptor';
 
 @Module({
   imports: [
@@ -20,6 +24,7 @@ import { SocketModule } from './socket/socket.module';
       isGlobal: true,
       load: CONFIGS_LIST_FOR_LOAD,
     }),
+    LoggerModule,
     IssuerModule,
     TypeOrmModule.forRootAsync({
       // ...AppDataSource.options,
@@ -47,7 +52,15 @@ import { SocketModule } from './socket/socket.module';
     SocketModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    CustomLoggerService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

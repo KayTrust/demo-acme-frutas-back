@@ -94,7 +94,7 @@ export class VerifierService {
         `Failed to retrieve all verifies: ${error.message}`,
         error.stack,
       );
-      throw new InternalServerErrorException('Failed to retrieve all verifies');
+      throw new InternalServerErrorException(error);
     }
   }
 }

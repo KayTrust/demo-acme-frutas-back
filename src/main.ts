@@ -5,6 +5,9 @@ import { ConfigEnvVars } from './configs';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DEFAULT_APP_NAME } from './configs/constants';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import * as path from 'path';
+import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,9 +18,19 @@ async function bootstrap() {
     origin: configService.get('ORIGINS'),
   });
 
-  console.log(
-    'NODE_ENV:',
-    configService.getOrThrow('NODE_ENV', { infer: true }),
+  if (!configService.getOrThrow('IS_PRODUCTION', { infer: true })) {
+    const logDir = path.join(process.cwd(), 'logs');
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+  }
+
+  const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
+
+  app.useLogger(logger);
+
+  logger.log(
+    'NODE_ENV: ' + configService.getOrThrow('NODE_ENV', { infer: true }),
   );
 
   const OpenAPIOptions = new DocumentBuilder()
