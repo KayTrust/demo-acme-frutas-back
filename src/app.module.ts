@@ -34,7 +34,7 @@ import { LoggingInterceptor } from './logger/logger.interceptor';
           type: 'sqlite',
           database: resolve('database/app.db'),
           entities: [Verify],
-          migrations: [resolve('dist/migrations/*.js')],
+          migrations: [resolve('dist/migrations/*.js'), resolve('./migrations/*.js')],
           synchronize: false,
           logging: true,
           migrationsRun: true,
