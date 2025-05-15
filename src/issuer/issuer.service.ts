@@ -28,13 +28,14 @@ export class IssuerService {
     };
   }
 
-  getIssuerDid(issuer_name: string) {
+  getIssuerDid(issuer_name: string, did_method: string = "ethr") {
     const melon_issuer_name = this.configService.get('MELON_ISSUER_NAME', {
       infer: true,
     });
     switch(issuer_name) {
       case 'defualt':
       case melon_issuer_name:
+        if (did_method=="near") return this.configService.getOrThrow("MELON_NEAR_DID", {infer: true});
         return this.configService.getOrThrow("MELON_ETHR_DID", {infer: true});
       default:
         throw new NotFoundException(`Issuer not found: ${issuer_name}`);
@@ -58,7 +59,7 @@ export class IssuerService {
     return `${base_issuer_uri}/${issuer_name}`;
   }
 
-  getCustomDisplayVcMelon() {
+  getCustomDisplayVcMelon(name: string, options?: Partial<OpenIdCredentialMetadata["display"]>) {
     return {
       "locale": "en-US",
       "card": {
@@ -72,7 +73,9 @@ export class IssuerService {
         },
         "description": "Blockchain Technologies"
       },
-    }
+      name,
+      ...options
+    } as OpenIdCredentialMetadata["display"]
   }
 
   getMelonOpenIdCredentialIssuerWellKnown(
@@ -91,10 +94,10 @@ export class IssuerService {
     const credentials_supported: OpenIdCredentialMetadata[] = [
       {
         format: 'jwt_vc',
-        id: 'AcmeAccreditationJWTVC',
+        id: 'AcmeAccreditationJWTVCDidEthr',
         types: ['VerifiableCredential', 'AcmeAccreditation'],
-        display: this.getCustomDisplayVcMelon() as any
-      },
+        display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree"),
+      }
     ];
 
     return this.generateOpenIdCredentialIssuerWellKnown(

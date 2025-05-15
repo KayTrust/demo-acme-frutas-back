@@ -6,7 +6,7 @@ import { ConfigEnvVars } from 'src/configs';
 import * as jose from 'jose'
 import { VpEvalError } from './errors/vp-eval.error';
 import { plainToInstance } from 'class-transformer';
-import { generarHash } from 'src/common/utils/functions';
+import { generarHash, getNearResolver } from 'src/common/utils/functions';
 import { CreateVerifyDto } from './dtos/create-verify.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -26,8 +26,8 @@ export class VerifierService {
     ) {}
 
     async evalVpToken(vp_token: string, xCorrelationId: string) {
-        const networks = this.configService.get("networks", {infer: true});
-        const resolver = new Resolver({...getResolver({networks})})
+        const networks = this.configService.get("ethr.networks", {infer: true});
+        const resolver = new Resolver({...getResolver({networks}), ...getNearResolver(this.configService)})
         const proof = new ProofTypeJWT({verifyOptions: {policies: {aud: false}}}, true)
         const resolution = await proof.verifyProof(vp_token, {resolver})
         // this.logger.log("evalVpToken.resolution: " + xCorrelationId + " - " + JSON.stringify(resolution));

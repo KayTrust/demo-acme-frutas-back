@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Headers, HttpException, HttpStatus, Logger, NotFoundException, Param, Post, Req, ValidationPipe } from '@nestjs/common';
 import { Request } from 'express';
-import { getFormatterErrorMessages, siteUrl } from 'src/common/utils/functions';
+import { getFormatterErrorMessages, getNearResolver, siteUrl } from 'src/common/utils/functions';
 import { IssuerService } from './issuer.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
@@ -95,8 +95,6 @@ export class IssuerController {
     if (!xCorrelationId) xCorrelationId = uuid()
 
     this.logger.log("issueCredential.req: " + xCorrelationId + " - " + JSON.stringify(req.body));
-
-    const issuer_did = this.issuerService.getIssuerDid(issuer_name);
     
     const validation = request.isValid(xCorrelationId);
 
@@ -113,17 +111,25 @@ export class IssuerController {
     if (request.proof) {
       if (request.proof.proof_type == "jwt") {
         const audience = this.issuerService.getIssuerUri(base_url, issuer_name)
-        const networks = this.configService.get("networks", {infer: true});
-        const resolver = new Resolver({...getResolver({networks})})
+        const networks = this.configService.get("ethr.networks", {infer: true});
+        const resolver = new Resolver({...getResolver({networks}), ...getNearResolver(this.configService)})
         user_did = await verifyJwtProof(request.proof.jwt, {audience, resolver})
       }
     }
 
     if (!user_did) throw new BadRequestException("Not found user did");
 
+    const issuer_did = this.issuerService.getIssuerDid(issuer_name, user_did.split(":")[1]);
+
+    this.logger.log("issueCredential.issuer_did: " + xCorrelationId + " - " + issuer_did);
+
     const vc = this.issuerService.getVcForIssuance(req.user!, user_did, issuer_name, issuer_did, request);
 
+    this.logger.log("issueCredential.vc: " + xCorrelationId + " - " + JSON.stringify(vc));
+
     const payload = createPayloadVCV1(vc);
+
+    this.logger.log("issueCredential.vc.payload: " + xCorrelationId + " - " + JSON.stringify(payload));
 
     const privateKey = this.issuerService.getIssuerPrivateKey(issuer_name);
 
@@ -132,9 +138,10 @@ export class IssuerController {
     try {
       response = {
         format: request.format,
-        credential: await createJWTVc("ethr", {privateKey}, payload, {audience: "https://frutas.demo.kaytrust.id"})
+        credential: await createJWTVc("ethr", {privateKey}, payload, {audience: payload.iss})
       };
     } catch (error) {
+      this.logger.error(error)
       throw new BadRequestException(error.message);
     }
 

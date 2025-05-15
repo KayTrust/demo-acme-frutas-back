@@ -1,5 +1,9 @@
+import { DIDResolver } from '@kaytrust/did-ethr';
+import { NearDIDResolver } from '@kaytrust/did-near-resolver';
+import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { Request } from 'express';
+import { ConfigEnvVars } from 'src/configs';
 
 export const concatRoutes = (...routes: string[]) => {
   return (
@@ -38,4 +42,20 @@ export function getFormatterErrorMessages<T>(errors: T) {
 
 export function format(template: string, ...args: string[]): string {
   return template.replace(/%s/g, () => args.shift() || '');
+}
+
+export const getNearResolver = (configService: ConfigService<ConfigEnvVars, true>): Record<string, DIDResolver> => {
+    const {nodeUrl, contractId, networkId} = configService.get("near", {infer: true});
+    const resolver = new NearDIDResolver(contractId, nodeUrl, networkId);
+    return {
+        near: async (did) => {
+          const didDocument = await resolver.resolveDID(did);
+          // const didDocument = await resolveNearDID(did, contractId);
+          return {
+            didDocument,
+            didResolutionMetadata: { contentType: "application/did+json" },
+            didDocumentMetadata: {},
+          };
+        },
+    };
 }

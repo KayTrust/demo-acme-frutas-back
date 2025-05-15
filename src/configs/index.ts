@@ -1,7 +1,7 @@
 import frontendConfig from './frontend.config';
 import keycloackConfig from './keycloack.config';
 import melonConfig from './melon.config';
-import networksConfig from './networks.config';
+import didsConfig from './dids.config';
 import openidConfig from './openid.config';
 import serverConfig from './server.config';
 import versionConfig from './version.config';
@@ -13,7 +13,7 @@ export const CONFIGS_LIST_FOR_LOAD = [
   melonConfig,
   keycloackConfig,
   frontendConfig,
-  networksConfig,
+  didsConfig,
 ];
 
 export type ConfigEnvVars = UnionToIntersection<
