@@ -861,19 +861,10 @@
   dependencies:
     did-jwt "^8.0.14"
 
-"@kaytrust/did-ethr@^0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@kaytrust/did-ethr/-/did-ethr-0.1.3.tgz#ead99ab9c5af6d01ab3f6e5642f0d8fcc90e2199"
-  integrity sha512-J7ZrwlwWBRYoI9PFt6BC7hNaeHL2gDGd6VsJdZqCBbEMD972eJZntenLK0XFM9u71/0j+YOrFQVktialFG+iCA==
-  dependencies:
-    dotenv "^16.4.5"
-    ethr-did "^3.0.21"
-    ethr-did-resolver "^10.1.10"
-
-"@kaytrust/did-ethr@^0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@kaytrust/did-ethr/-/did-ethr-0.1.4.tgz#edbb91f6f92c6f2d49647675d34f7fa89cebd0ba"
-  integrity sha512-M8u09C9Xsd/SyZsLuBHm3I15ixdw7Fi39LscBiQ8BccS5jAz9LXP8sBY92wk+2+CIZPtn9HuQMHryLbSkkidHw==
+"@kaytrust/did-ethr@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@kaytrust/did-ethr/-/did-ethr-0.1.5.tgz#72dbb044103f0aaa7008617a276fff4bf108ac07"
+  integrity sha512-4QFJj3I9MMi4T/lSf7khqhmv0viEFBQmTbfm3NDdwj+2bx0PN2SgIANo0CzkMCDH9Qav50xBXGnRgsj/M+naaQ==
   dependencies:
     "@kaytrust/did-base" "^0.1.0"
     dotenv "^16.4.5"
@@ -888,10 +879,19 @@
     bs58 "^6.0.0"
     near-api-js "^5.1.1"
 
-"@kaytrust/did-near@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@kaytrust/did-near/-/did-near-0.1.0.tgz#482a66edaf817e9ceaef0806e1995f880afd59c4"
-  integrity sha512-VQSKq4o/Hs3iDyXOEKly09bq53mSIytXN8dGtjqGgzmQwUBc0ftmYmWPLTpuQWF00CnOf2o4+7ph/w1q9eT4Sw==
+"@kaytrust/did-near-resolver@^1.3.3":
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/@kaytrust/did-near-resolver/-/did-near-resolver-1.3.3.tgz#c917c26ee89582ff1984ffada44a72309ca38d9e"
+  integrity sha512-5gf+mCmf3JWmJ/EgnCBB6KS/b4JJCmzl/X1QbkaUe0ntoKlUTvsWZYNWIzgCoLGNXUR1TB3ccw+v+gSWSe55oA==
+  dependencies:
+    bs58 "^6.0.0"
+    did-resolver "^4.1.0"
+    near-api-js "^5.1.1"
+
+"@kaytrust/did-near@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@kaytrust/did-near/-/did-near-0.1.2.tgz#57c2369991329f3536f962f960b37c89ac5d455d"
+  integrity sha512-atAueiKNbr5jTciGoZwLSvWiGYRbNCgSS85gIkJeqjtcmXHuXqST0SobKqDoeRuYtthDBESJLd8CgD3w/C/68A==
   dependencies:
     "@kaytrust/did-base" "^0.1.0"
     "@kaytrust/did-near-resolver" "^1.3.2"
@@ -903,32 +903,34 @@
     tweetnacl "^1.0.3"
     tweetnacl-util "^0.15.1"
 
-"@kaytrust/openid4vci@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@kaytrust/openid4vci/-/openid4vci-0.3.0.tgz#b58c1c27637f3ebe5b835630828baa03a7e57611"
-  integrity sha512-pB5s5kcLnmII0kg3VIckF05LbSApXIL8gyi5BH4hw7oYTKWYHubKD2Wj0O5PqIWf5GtVpBuHcLSfp0dcKmQvOw==
+"@kaytrust/openid4vci@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@kaytrust/openid4vci/-/openid4vci-0.3.2.tgz#322869d42fa4dc55bca925a06e029fce2b2b31fd"
+  integrity sha512-RHeovOcjcOnYCBNnHUgvI3Y2xr+IjSMQ/WuILtBhe2QuUU96n7iHJZxVsCmKwnQ1c1izNbA6FkmffXWsDz5jsg==
   dependencies:
-    "@kaytrust/did-ethr" "^0.1.4"
-    "@kaytrust/did-near" "^0.1.0"
-    "@kaytrust/prooftypes" "^0.1.5"
+    "@kaytrust/did-ethr" "^0.1.5"
+    "@kaytrust/did-near" "^0.1.2"
+    "@kaytrust/prooftypes" "^0.1.9"
     "@noble/hashes" "^1.8.0"
-    axios "^1.7.7"
+    axios "^1.8.2"
     base64url "^3.0.1"
     class-transformer "^0.5.1"
     class-validator "^0.14.1"
     did-jwt "^8.0.14"
+    jose "^5.9.4"
     node-jose "^2.2.0"
     qs "^6.13.0"
     tweetnacl "^1.0.3"
 
-"@kaytrust/prooftypes@^0.1.5":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@kaytrust/prooftypes/-/prooftypes-0.1.6.tgz#557fad7c9fb09bafcbaa9f026ea85e6ab5655505"
-  integrity sha512-+SePN2oxm1Y8epOmk9x+LBGPcIrj21pxYVnqGb9KKb/SXVRp/7/TCx8zTm3rTg4yQv7Bh4QKGFhQgBMlT96Lrw==
+"@kaytrust/prooftypes@^0.1.9":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@kaytrust/prooftypes/-/prooftypes-0.1.12.tgz#aa18aab1bb6da8da31ce9511da7951e7443a6757"
+  integrity sha512-82Q7gYMznjj8OWSMwPrT1jfTMmZNxOaCm/vX7L1rzPXXkfFAHfNbJu8tnET0AhagxI30/e0A0DUJbZyiWIyqiA==
   dependencies:
     "@kaytrust/did-base" "^0.1.0"
-    "@kaytrust/did-ethr" "^0.1.3"
+    "@kaytrust/did-ethr" "^0.1.5"
     did-jwt-vc "^4.0.4"
+    near-api-js "5.1.1"
 
 "@lukeed/csprng@^1.0.0":
   version "1.1.0"
@@ -2435,10 +2437,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-axios@^1.7.7:
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.8.4.tgz#78990bb4bc63d2cae072952d374835950a82f447"
-  integrity sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==
+axios@^1.8.2:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.10.0.tgz#af320aee8632eaf2a400b6a1979fa75856f38d54"
+  integrity sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
@@ -5004,6 +5006,11 @@ jose@^4.15.4:
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.15.9.tgz#9b68eda29e9a0614c042fa29387196c7dd800100"
   integrity sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==
 
+jose@^5.9.4:
+  version "5.10.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.10.0.tgz#c37346a099d6467c401351a9a0c2161e0f52c4be"
+  integrity sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==
+
 js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -5647,7 +5654,7 @@ near-abi@0.2.0:
   dependencies:
     "@types/json-schema" "^7.0.11"
 
-near-api-js@^5.1.1:
+near-api-js@5.1.1, near-api-js@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/near-api-js/-/near-api-js-5.1.1.tgz#64905f74d0ad9ce0b4f5ad6ec4aaa8403b8e5968"
   integrity sha512-h23BGSKxNv8ph+zU6snicstsVK1/CTXsQz4LuGGwoRE24Hj424nSe4+/1tzoiC285Ljf60kPAqRCmsfv9etF2g==

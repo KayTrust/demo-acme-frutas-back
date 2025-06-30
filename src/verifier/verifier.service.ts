@@ -14,6 +14,7 @@ import { Verify } from './entities';
 import { VerifyDto } from './dtos/verify.dto';
 import { sanitizeVerify } from './helpers/sanitize-user';
 import { SocketService } from 'src/socket/services/socket.service';
+import { MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 
 @Injectable()
 export class VerifierService {
@@ -26,8 +27,9 @@ export class VerifierService {
     ) {}
 
     async evalVpToken(vp_token: string, xCorrelationId: string) {
+        const network = this.configService.get("ethr.default_network", {infer: true});
         const networks = this.configService.get("ethr.networks", {infer: true});
-        const resolver = new Resolver({...getResolver({networks}), ...getNearResolver(this.configService)})
+        const resolver = new Resolver({...getResolver({...network, networks}), ...getNearResolver(this.configService)})
         const proof = new ProofTypeJWT({verifyOptions: {policies: {aud: false}}}, true)
         const resolution = await proof.verifyProof(vp_token, {resolver})
         // this.logger.log("evalVpToken.resolution: " + xCorrelationId + " - " + JSON.stringify(resolution));
@@ -37,8 +39,8 @@ export class VerifierService {
         const issuer = payload.iss;
         const vp = payload.vp;
         const credential = [vp.verifiableCredential].flat().find((cred)=>{
-        const cred_payload = jose.decodeJwt(cred as string) as JwtCredentialPayload
-            return !!cred_payload.vc?.type.includes('AcmeAccreditation') && !!cred_payload.vc?.type.includes('VerifiableCredential')
+          const cred_payload = jose.decodeJwt(cred as string) as JwtCredentialPayload
+          return [MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR].some((type)=>!!cred_payload.vc?.type.includes(type)) && !!cred_payload.vc?.type.includes('VerifiableCredential')
         })
         if (!credential) throw new VpEvalError(`VerifiableCredential, AcmeAccreditation not found (${xCorrelationId})`);
 

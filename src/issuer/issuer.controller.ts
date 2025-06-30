@@ -119,7 +119,7 @@ export class IssuerController {
 
     if (!user_did) throw new BadRequestException("Not found user did");
 
-    const issuer_did = this.issuerService.getIssuerDid(issuer_name, user_did.split(":")[1]);
+    const issuer_did = this.issuerService.getIssuerDid(issuer_name, user_did.split(":")[1], request);
 
     this.logger.log("issueCredential.issuer_did: " + xCorrelationId + " - " + issuer_did);
 

@@ -6,7 +6,8 @@ import {v4 as uuid} from 'uuid'
 import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import { CredentialRequestDto } from './dtos/credential-request.dto';
 import { plainToInstance } from 'class-transformer';
-import { OpenIdCredentialIssuerMetadata, OpenIdCredentialMetadata } from '@kaytrust/openid4vci';
+import { OpenidCredentialFormat, OpenIdCredentialIssuerMetadata, OpenIdCredentialMetadata } from '@kaytrust/openid4vci';
+import { MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 
 @Injectable()
 export class IssuerService {
@@ -28,13 +29,15 @@ export class IssuerService {
     };
   }
 
-  getIssuerDid(issuer_name: string, did_method: string = "ethr") {
+  getIssuerDid(issuer_name: string, did_method: string = "ethr", req: CredentialRequestDto) {
     const melon_issuer_name = this.configService.get('MELON_ISSUER_NAME', {
       infer: true,
     });
     switch(issuer_name) {
       case 'defualt':
       case melon_issuer_name:
+        if (req.types.includes(MELON_VC_TYPE_NEAR)) return this.configService.getOrThrow("MELON_NEAR_DID", {infer: true});
+        if (req.types.includes(MELON_VC_TYPE_ETHR)) return this.configService.getOrThrow("MELON_ETHR_DID", {infer: true});
         if (did_method=="near") return this.configService.getOrThrow("MELON_NEAR_DID", {infer: true});
         return this.configService.getOrThrow("MELON_ETHR_DID", {infer: true});
       default:
@@ -91,12 +94,23 @@ export class IssuerService {
       { infer: true },
     );
     const credential_endpoint = `${credential_issuer}/credential/issue`;
+
+    const format:OpenidCredentialFormat = OpenidCredentialFormat.jwt_vc
+
     const credentials_supported: OpenIdCredentialMetadata[] = [
       {
-        format: 'jwt_vc',
-        id: 'AcmeAccreditationJWTVCDidEthr',
-        types: ['VerifiableCredential', 'AcmeAccreditation'],
-        display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree"),
+        format: format,
+        // id: 'AcmeAccreditationJWTVCDidEthr',
+        id: MELON_VC_TYPE_ETHR + format,
+        types: ['VerifiableCredential', MELON_VC_TYPE_ETHR],
+        display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree - ETHR"),
+      },
+      {
+        format: format,
+        // id: 'AcmeAccreditationJWTVCDidNear',
+        id: MELON_VC_TYPE_NEAR + format,
+        types: ['VerifiableCredential', MELON_VC_TYPE_NEAR],
+        display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree - NEAR"),
       }
     ];
 
@@ -128,7 +142,7 @@ export class IssuerService {
     const name = user.name;
     const email = user.email;
     return plainToInstance(VerifiableCredentialV1Dto, {
-      type: ["AcmeAccreditation", "VerifiableCredential"],
+      type: req.types,
       "@context": ["https://www.w3.org/2018/credentials/v1"],
       issuer: did_issuer,
       issuanceDate: issuanceDateString,
@@ -162,7 +176,19 @@ export class IssuerService {
           "format": "jwt_vc",
           "types": [
             "VerifiableCredential",
-            "AcmeAccreditation"
+            MELON_VC_TYPE_ETHR,
+          ],
+          "trust_framework": {
+            "name": "Melón University",
+            "type": "Accreditation",
+            "uri": "TIR link towards accreditation"
+          }
+        },
+        {
+          "format": "jwt_vc",
+          "types": [
+            "VerifiableCredential",
+            MELON_VC_TYPE_NEAR,
           ],
           "trust_framework": {
             "name": "Melón University",

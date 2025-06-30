@@ -25,7 +25,6 @@ import { LoggingInterceptor } from './logger/logger.interceptor';
       load: CONFIGS_LIST_FOR_LOAD,
     }),
     LoggerModule,
-    IssuerModule,
     TypeOrmModule.forRootAsync({
       // ...AppDataSource.options,
       // autoLoadEntities: true,
@@ -48,6 +47,7 @@ import { LoggingInterceptor } from './logger/logger.interceptor';
       },
     }),
     AuthModule,
+    IssuerModule,
     VerifierModule,
     SocketModule,
   ],
