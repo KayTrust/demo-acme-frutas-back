@@ -11,7 +11,7 @@ import { IssuerErrorCode, IssuerErrors } from './constants/issuer-errors';
 import { Public } from 'src/auth/decorators/public-auth.decorator';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { Resolver } from 'did-resolver'
-import { getResolver } from '@kaytrust/did-ethr';
+import { getResolver as getEthResolver } from '@kaytrust/did-ethr';
 
 @Controller('issuer')
 export class IssuerController {
@@ -112,7 +112,7 @@ export class IssuerController {
       if (request.proof.proof_type == "jwt") {
         const audience = this.issuerService.getIssuerUri(base_url, issuer_name)
         const networks = this.configService.get("ethr.networks", {infer: true});
-        const resolver = new Resolver({...getResolver({networks}), ...getNearResolver(this.configService)})
+        const resolver = new Resolver({...getEthResolver({networks}), ...getNearResolver(this.configService)})
         user_did = await verifyJwtProof(request.proof.jwt, {audience, resolver})
       }
     }

@@ -13,7 +13,7 @@ export default () => {
 
   if (!MELON_ETHR_DID) {
     const wallet = new Wallet(MELON_PRIVATE_KEY);
-    const didEthr = createDidEthr(wallet.address, {chainNameOrId: ETHR_CHAIN_ID == '1' ? undefined : ETHR_CHAIN_ID});
+    const didEthr = createDidEthr(wallet.address, {chainNameOrId: Number(ETHR_CHAIN_ID)});
     did = didEthr.did;
   }
   if (!did_near) {
