@@ -879,10 +879,10 @@
     bs58 "^6.0.0"
     near-api-js "^5.1.1"
 
-"@kaytrust/did-near-resolver@^1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@kaytrust/did-near-resolver/-/did-near-resolver-1.3.4.tgz#acfda3e0ddf79aeaefb57427f873f4a586f7d9f0"
-  integrity sha512-UnPdPbMDZN7bf97hk0RWiQ9alzW1ZUkUI+8kzQLBRQFfrZ38VddO10SvxhQEAOPfXwLOoRHAkFA5JqAdt6Qw/Q==
+"@kaytrust/did-near-resolver@^1.3.5":
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@kaytrust/did-near-resolver/-/did-near-resolver-1.3.5.tgz#d02ce25fb91487badd6f7244593fcbe8abbbd3d6"
+  integrity sha512-30IlBEM6Y3uq9pf/HT2NhJNUbLponk7kZKzhzkdxgqRK1ODHNpKubghBkrzf2bE0lIeZRvDwUDj2SV3jHtK8pA==
   dependencies:
     bs58 "^6.0.0"
     did-resolver "^4.1.0"
