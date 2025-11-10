@@ -1,11 +1,12 @@
 {
   "name": "demo-acme-frutas-back",
-  "version": "0.3.3",
+  "version": "0.4.3",
   "description": "",
   "author": "Geiner Grandez Valle (https://github.com/geinergv)",
   "license": "ISC",
   "scripts": {
     "sync-version": "node ./scripts/version.js",
+    "gen-ver": "yarn sync-version",
     "build": "yarn sync-version && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "yarn sync-version && nest start",
@@ -20,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@cef-ebsi/key-did-resolver": "^2.1.1",
     "@kaytrust/did-near": "^0.1.2",
     "@kaytrust/did-near-resolver": "^1.3.5",
     "@kaytrust/openid4vci": "^0.3.2",

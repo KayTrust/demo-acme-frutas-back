@@ -6,12 +6,13 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
 import { CredentialRequestDto } from './dtos/credential-request.dto';
 import {v4 as uuid} from 'uuid'
-import { createPayloadVCV1, Openid4VCIErrors, createJWTVc, verifyJwtProof } from '@kaytrust/openid4vci';
+import { createPayloadVCV1, Openid4VCIErrors, createJWT, verifyJwtProof, createJWKFromPrivateKey, SupportedDid } from '@kaytrust/openid4vci';
 import { IssuerErrorCode, IssuerErrors } from './constants/issuer-errors';
 import { Public } from 'src/auth/decorators/public-auth.decorator';
 import { ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { Resolver } from 'did-resolver'
 import { getResolver as getEthResolver } from '@kaytrust/did-ethr';
+import { getResolver as _getKeyResolver } from "@cef-ebsi/key-did-resolver";
 
 @Controller('issuer')
 export class IssuerController {
@@ -112,14 +113,18 @@ export class IssuerController {
       if (request.proof.proof_type == "jwt") {
         const audience = this.issuerService.getIssuerUri(base_url, issuer_name)
         const networks = this.configService.get("ethr.networks", {infer: true});
-        const resolver = new Resolver({...getEthResolver({networks}), ...getNearResolver(this.configService)})
+        const resolver = new Resolver({...getEthResolver({networks}), ...getNearResolver(this.configService), ..._getKeyResolver()})
         user_did = await verifyJwtProof(request.proof.jwt, {audience, resolver})
       }
     }
 
     if (!user_did) throw new BadRequestException("Not found user did");
 
-    const issuer_did = this.issuerService.getIssuerDid(issuer_name, user_did.split(":")[1], request);
+    const did_method_user = user_did.split(":")[1];
+
+    const issuer_did = this.issuerService.getIssuerDid(issuer_name, did_method_user, request);
+
+    const did_method_issuer = issuer_did.split(":")[1] as SupportedDid;
 
     this.logger.log("issueCredential.issuer_did: " + xCorrelationId + " - " + issuer_did);
 
@@ -131,14 +136,19 @@ export class IssuerController {
 
     this.logger.log("issueCredential.vc.payload: " + xCorrelationId + " - " + JSON.stringify(payload));
 
-    const privateKey = this.issuerService.getIssuerPrivateKey(issuer_name);
+    const _privateKey = this.issuerService.getIssuerPrivateKey(issuer_name);
 
     let response: {format: string, credential: string};
+
+    let no_vc_vp = did_method_issuer == "key";
+
+    let jwk = no_vc_vp ? await createJWKFromPrivateKey(_privateKey, {crv: 'P-256'}) : undefined;
+    let privateKey = no_vc_vp ? undefined : _privateKey;
 
     try {
       response = {
         format: request.format,
-        credential: await createJWTVc("ethr", {privateKey}, payload, {audience: payload.iss})
+        credential: await createJWT(did_method_issuer, {privateKey, jwk}, payload, {audience: payload.iss, is_presentation: false, no_vc_vp: no_vc_vp}),
       };
     } catch (error) {
       this.logger.error(error)

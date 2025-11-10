@@ -7,7 +7,7 @@ import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import { CredentialRequestDto } from './dtos/credential-request.dto';
 import { plainToInstance } from 'class-transformer';
 import { OpenidCredentialFormat, OpenIdCredentialIssuerMetadata, OpenIdCredentialMetadata } from '@kaytrust/openid4vci';
-import { MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
+import { MELON_VC_TYPE_ETHR, MELON_VC_TYPE_KEY, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 
 @Injectable()
 export class IssuerService {
@@ -37,6 +37,7 @@ export class IssuerService {
       case 'defualt':
       case melon_issuer_name:
         if (req.types.includes(MELON_VC_TYPE_NEAR)) return this.configService.getOrThrow("MELON_NEAR_DID", {infer: true});
+        if (req.types.includes(MELON_VC_TYPE_KEY)) return this.configService.getOrThrow("MELON_KEY_DID", {infer: true});
         if (req.types.includes(MELON_VC_TYPE_ETHR)) return this.configService.getOrThrow("MELON_ETHR_DID", {infer: true});
         if (did_method=="near") return this.configService.getOrThrow("MELON_NEAR_DID", {infer: true});
         return this.configService.getOrThrow("MELON_ETHR_DID", {infer: true});
@@ -111,6 +112,13 @@ export class IssuerService {
         id: MELON_VC_TYPE_NEAR + format,
         types: ['VerifiableCredential', MELON_VC_TYPE_NEAR],
         display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree - NEAR"),
+      },
+      {
+        format: format,
+        // id: 'AcmeAccreditationJWTVCDidKey',
+        id: MELON_VC_TYPE_KEY + format,
+        types: ['VerifiableCredential', MELON_VC_TYPE_KEY],
+        display: this.getCustomDisplayVcMelon("Melon Bachelor's Degree - KEY"),
       }
     ];
 
@@ -189,6 +197,18 @@ export class IssuerService {
           "types": [
             "VerifiableCredential",
             MELON_VC_TYPE_NEAR,
+          ],
+          "trust_framework": {
+            "name": "Melón University",
+            "type": "Accreditation",
+            "uri": "TIR link towards accreditation"
+          }
+        },
+        {
+          "format": "jwt_vc",
+          "types": [
+            "VerifiableCredential",
+            MELON_VC_TYPE_KEY,
           ],
           "trust_framework": {
             "name": "Melón University",

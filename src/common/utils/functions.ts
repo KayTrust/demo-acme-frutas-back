@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { Request } from 'express';
 import { ConfigEnvVars } from 'src/configs';
+import { util as utilKeyDidResolver } from "@cef-ebsi/key-did-resolver";
+import { createJWKFromPrivateKey, CreateJwkFromWalletOptions } from "@kaytrust/openid4vci";
 
 export const concatRoutes = (...routes: string[]) => {
   return (
@@ -59,3 +61,8 @@ export const getNearResolver = (configService: ConfigService<ConfigEnvVars, true
         },
     };
 }
+
+export const generateKeyProfileWithPrivateKey = async (private_key: string, options?: CreateJwkFromWalletOptions): Promise<string> => {
+  const jwk = await createJWKFromPrivateKey(private_key, options);
+  return utilKeyDidResolver.createDid(jwk);
+};
