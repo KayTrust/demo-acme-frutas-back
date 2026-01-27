@@ -128,11 +128,19 @@ export class IssuerController {
 
     const token = authHeader.split(' ')[1];
 
-    const user_info = await firstValueFrom(this.issuerService.getUserInfoFromToken(token));
+    let data_user = req.user!;
 
-    this.logger.log("issueCredential.user_info: " + xCorrelationId + " - " + JSON.stringify(user_info.data));
+    try {
+      const user_info = await firstValueFrom(this.issuerService.getUserInfoFromToken(token));
+      data_user = user_info.data;
+    } catch (error) {
+      this.logger.error("issueCredential.user_info.error: " + xCorrelationId + " - " + JSON.stringify(error));
+      data_user = req.user!;
+    }
 
-    const vc = this.issuerService.getVcForIssuance(user_info.data, user_did, issuer_name, issuer_did, request);
+    this.logger.log("issueCredential.user_info: " + xCorrelationId + " - " + JSON.stringify(data_user));
+
+    const vc = this.issuerService.getVcForIssuance(data_user, user_did, issuer_name, issuer_did, request);
 
     this.logger.log("issueCredential.vc: " + xCorrelationId + " - " + JSON.stringify(vc));
 
