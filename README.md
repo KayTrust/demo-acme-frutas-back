@@ -105,6 +105,7 @@ The project uses several environment variables defined in the configuration file
 | Variable              | Description                                                                                  | Mandatory   | Default Value                  | Example                                     |
 |-----------------------|----------------------------------------------------------------------------------------------|-------------|--------------------------------|---------------------------------------------|
 | `JWKS_URI`            | URL of the JWKS server to validate JWT tokens                                                | Yes         | N/A                            | `https://auth.example.com/protocol/openid-connect/certs` |
+| `USERINFO_URI`        | URL of the Keycloak userinfo endpoint to fetch user details                                  | Yes         | N/A                            | `https://auth.example.com/protocol/openid-connect/userinfo` |
 
 ### Network Configuration Variables
 

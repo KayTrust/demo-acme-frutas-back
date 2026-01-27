@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
 import { VerifiableCredentialV1Dto } from './models/verifiable-credential-v1.model';
@@ -8,11 +8,14 @@ import { CredentialRequestDto } from './dtos/credential-request.dto';
 import { plainToInstance } from 'class-transformer';
 import { OpenidCredentialFormat, OpenIdCredentialIssuerMetadata, OpenIdCredentialMetadata } from '@kaytrust/openid4vci';
 import { MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class IssuerService {
+  private readonly logger = new Logger(IssuerService.name);
   constructor(
     private readonly configService: ConfigService<ConfigEnvVars, true>,
+    private readonly httpService: HttpService,
   ) {}
 
   generateOpenIdCredentialIssuerWellKnown(
@@ -131,6 +134,16 @@ export class IssuerService {
       default:
         throw new NotFoundException(`VC not found: ${issuer_name}`);
     }
+  }
+
+  getUserInfoFromToken(token: string) {
+    const userinfo_uri = this.configService.getOrThrow("USERINFO_URI", {infer: true});
+    this.logger.log("Fetching user info from: " + userinfo_uri);
+    return this.httpService.get(userinfo_uri, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
   }
 
   getVcForMelonIssuance(user: JwtPayload, user_did: string, issuer_name: string, did_issuer: string, req: CredentialRequestDto): VerifiableCredentialV1Dto {
