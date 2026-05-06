@@ -313,6 +313,16 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@cef-ebsi/key-did-resolver@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@cef-ebsi/key-did-resolver/-/key-did-resolver-2.1.1.tgz#96302fa3ee1541a783cf0294e447ce571397f472"
+  integrity sha512-qXZBFaWVeeWaOm0wHIRuDnN1Cpe+TrHB4FFWloBBmRw+9taWDi4FuJtk011391uTW8CEh9Y3mMV3yUt+B32oTg==
+  dependencies:
+    did-resolver "^4.1.0"
+    lodash.isplainobject "^4.0.6"
+    multiformats "^9.6.2"
+    uint8arrays "3.1.1"
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"

@@ -17,5 +17,5 @@ export const CONFIGS_LIST_FOR_LOAD = [
 ];
 
 export type ConfigEnvVars = UnionToIntersection<
-  ReturnType<(typeof CONFIGS_LIST_FOR_LOAD)[number]>
+  Awaited<ReturnType<(typeof CONFIGS_LIST_FOR_LOAD)[number]>>
 >;
