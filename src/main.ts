@@ -33,6 +33,11 @@ async function bootstrap() {
     'NODE_ENV: ' + configService.getOrThrow('NODE_ENV', { infer: true }),
   );
 
+  const IS_PROD = configService.get("IS_PRODUCTION", { infer: true });
+
+  app.setBaseViewsDir(path.join(__dirname, IS_PROD ? "." : "..", 'views'));
+  app.setViewEngine('hbs');
+
   const OpenAPIOptions = new DocumentBuilder()
     .setTitle(DEFAULT_APP_NAME)
     .setDescription('Back: ' + DEFAULT_APP_NAME)

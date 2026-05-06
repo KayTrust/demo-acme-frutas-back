@@ -21,10 +21,11 @@ export class VerifierController {
     return this.verifierService.findAll();
   }
 
-  getRedirectUri(path: string) {
-    const base = this.configService.get("FRONTEND_BASE_URL", { infer: true }).replace(/\/+$/g, "")
+  getRedirectUri(path: string, base?: string) {
+    const defaultFrontendBase = this.configService.get("FRONTEND_BASE_URL", { infer: true });
+    const baseUrl = (base || defaultFrontendBase).replace(/\/+$/g, "")
     path = path.replace(/^\/+/g, "")
-    return `${base}/${path}`
+    return `${baseUrl}/${path}`
   }
 
   @Get('oauth2/cb/vpToken')

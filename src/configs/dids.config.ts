@@ -9,9 +9,9 @@ export interface ProviderConfiguration {
 }
 
 export default () => {
-  const { ETHR_CHAIN_ID = 80002, ETHR_REGISTRY = "0xBC56d0883ef228b2B16420E9002Ece0A46c893F8", ETHR_RPC_URL, NEAR_CONTRACT_ID = "neardti.testnet", NEAR_NETWORK_ID, NEAR_NODE_URL="https://rpc.testnet.near.org" } = process.env;
+  const { ETHR_CHAIN_ID = 80002, ETHR_REGISTRY = "0xBC56d0883ef228b2B16420E9002Ece0A46c893F8", ETHR_RPC_URL, NEAR_CONTRACT_ID = "neardti.testnet", NEAR_NETWORK_ID, NEAR_NODE_URL = "https://rpc.testnet.near.org", EBSI_DID_REGISTRIES } = process.env;
 
-  const default_network:ProviderConfiguration = {
+  const default_network: ProviderConfiguration = {
     chainId: Number(ETHR_CHAIN_ID),
     registry: ETHR_REGISTRY,
     rpcUrl: ETHR_RPC_URL,
@@ -27,5 +27,12 @@ export default () => {
       networkId: NEAR_NETWORK_ID,
       nodeUrl: NEAR_NODE_URL
     },
+    ebsi: {
+      registries: EBSI_DID_REGISTRIES ? EBSI_DID_REGISTRIES.split(",").map((url) => url.trim()) : [
+        'https://api-conformance.ebsi.eu/did-registry/v5/identifiers',
+        'https://api-pilot.ebsi.eu/did-registry/v4/identifiers',
+        'https://api-conformance.ebsi.eu/did-registry/v4/identifiers',
+      ],
+    }
   };
 };

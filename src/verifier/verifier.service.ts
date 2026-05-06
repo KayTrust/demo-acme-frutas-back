@@ -16,6 +16,7 @@ import { sanitizeVerify } from './helpers/sanitize-user';
 import { SocketService } from 'src/socket/services/socket.service';
 import { MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 import { getResolver as _getKeyResolver } from "@cef-ebsi/key-did-resolver";
+import { getEbsiResolver } from 'src/common/utils/ebsi-multienvironment-resolver';
 
 @Injectable()
 export class VerifierService {
@@ -30,7 +31,7 @@ export class VerifierService {
     async evalVpToken(vp_token: string, xCorrelationId: string) {
         const network = this.configService.get("ethr.default_network", {infer: true});
         const networks = this.configService.get("ethr.networks", {infer: true});
-        const resolver = new Resolver({...getResolver({...network, networks}), ...getNearResolver(this.configService), ..._getKeyResolver()})
+        const resolver = new Resolver({...getResolver({...network, networks}), ...getNearResolver(this.configService), ..._getKeyResolver(), ...getEbsiResolver(this.configService.get("ebsi.registries", {infer: true}))});
         const proof = new ProofTypeJWT({verifyOptions: {policies: {aud: false}}}, true)
         const resolution = await proof.verifyProof(vp_token, {resolver})
         // this.logger.log("evalVpToken.resolution: " + xCorrelationId + " - " + JSON.stringify(resolution));
@@ -57,7 +58,7 @@ export class VerifierService {
         if (!resolution_vc.verified) throw new VpEvalError("Failed on verified vc AcmeAccreditation: " + xCorrelationId);
 
         const name = cred_payload.vc.credentialSubject.name
-        const email = cred_payload.vc.credentialSubject.email
+        const email = cred_payload.vc.credentialSubject.email ?? ''
 
         const display_name = name ? name : email;
 
@@ -81,8 +82,8 @@ export class VerifierService {
       const verify = this.verifyRepository.create(createVerifyDto);
       return sanitizeVerify(await this.verifyRepository.save(verify));
     } catch (error) {
-      this.logger.error(`Failed to create verify: ${error.message}`, error.stack);
-      throw new InternalServerErrorException('Failed to create verify');
+      this.logger.error(`Failed to verify: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to verify');
     }
   }
 
