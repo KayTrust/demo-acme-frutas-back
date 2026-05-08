@@ -89,7 +89,9 @@ export class IdentifyController {
     try {
       this.logger.log(`identify.cb [${xCorrelationId}]: ${JSON.stringify(query)}`);
       const verifyDto = await this.verifierService.evalVpToken(query.vp_token, xCorrelationId, {
-        credentialTypes: ['NameAttestation']
+        credentialTypes: ['NameAttestation'],
+        handler: 'identify',
+        metadata: { unused: true },
       }, query.state);
 
       this.setSessionIdentity(req, verifyDto);
@@ -125,16 +127,16 @@ export class IdentifyController {
       }
     }
 
-    // me gustaria que solo se pudiera utilizar el hash una vez, para evitar que alguien copie el link y se lo envie a otra persona
+    const verify = await this.verifierService.findHash(hash, 'identify');
 
-    const verify = await this.verifierService.findHash(hash);
-
-    if (!verify) {
+    if (!verify || !verify.verified || verify.handler !== 'identify' || !verify.metadata || !verify.metadata.unused) {
+      this.logger.warn(`Invalid or already used hash: ${hash}`);
       return res.redirect(relativeUrl(req, '..'));
     }
 
     const identity: SessionIdentity = { id: verify.id, name: verify.name, did: verify.did };
 
+    await this.verifierService.update(verify.id, { metadata: { ...verify.metadata, unused: false } });
 
     // Set session cookie to register the identified user
     this.setSessionIdentity(req, identity);

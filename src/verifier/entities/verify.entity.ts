@@ -17,4 +17,10 @@ export class Verify extends BaseEntity {
 
   @Column('boolean', { default: () => false })
   verified: boolean;
+
+  @Column({ nullable: true })
+  handler: string;
+
+  @Column({ type: 'simple-json', nullable: true })
+  metadata: Record<string, any> | null;
 }

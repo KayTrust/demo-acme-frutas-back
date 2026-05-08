@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional, IsObject } from 'class-validator';
 
 export class CreateVerifyDto {
   @ApiProperty({
@@ -45,4 +45,22 @@ export class CreateVerifyDto {
     example: false,
   })
   verified: boolean;
+
+  @ApiProperty({
+    required: false,
+    description: 'Handler identifier',
+    example: 'some-handler'
+  })
+  @IsString()
+  @IsOptional()
+  handler?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Arbitrary metadata object',
+    example: { key: 'value' }
+  })
+  @IsObject()
+  @IsOptional()
+  metadata?: Record<string, any>;
 }

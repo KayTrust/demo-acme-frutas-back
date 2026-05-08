@@ -19,6 +19,8 @@ import { getEbsiResolver } from 'src/common/utils/ebsi-multienvironment-resolver
 
 export interface EvalVpTokenOptions {
   credentialTypes: string[];
+  handler?: string;
+  metadata?: Record<string, any>;
 }
 
 @Injectable()
@@ -69,6 +71,8 @@ export class VerifierService {
             did: issuer, email, name: display_name, 
             vpHash: generarHash(vp_token),
             verified: true,
+            handler: options.handler,
+            metadata: options.metadata,
         } as CreateVerifyDto);
 
         const verifyDto = await this.create(createDto);
@@ -119,18 +123,37 @@ export class VerifierService {
     }
   }
 
-  async findHash(hash: string): Promise<VerifyDto | null> {
+  async findHash(hash: string, handler?: string): Promise<VerifyDto | null> {
     try {
-      this.logger.log(`Finding verify with hash: ${hash}`);
+      this.logger.log(`Finding verify with hash: ${hash} and handler: ${handler}`);
       if (!hash) {
         this.logger.warn('No hash provided for findHash');
         return null;
       }
-      const verify = await this.verifyRepository.findOne({ where: { vpHash: hash } });
+      const verify = await this.verifyRepository.findOne({ where: { vpHash: hash, handler } });
       return verify ? sanitizeVerify(verify) : null;
     } catch (error) {
-      this.logger.error(`Failed to find verify with hash ${hash}: ${error.message}`, error.stack);
+      this.logger.error(`Failed to find verify with hash ${hash} and handler ${handler}: ${error.message}`, error.stack);
       return null;
+    }
+  }
+
+  async update(id: string, fields: Partial<Pick<CreateVerifyDto, 'handler' | 'metadata' | 'verified' | 'name' | 'email'>>): Promise<VerifyDto | null> {
+    try {
+      if (!id) {
+        this.logger.warn('No id provided for update');
+        return null;
+      }
+      const verify = await this.verifyRepository.findOne({ where: { id } });
+      if (!verify) {
+        this.logger.warn(`Verify not found for update: ${id}`);
+        return null;
+      }
+      Object.assign(verify, fields);
+      return sanitizeVerify(await this.verifyRepository.save(verify));
+    } catch (error) {
+      this.logger.error(`Failed to update verify ${id}: ${error.message}`, error.stack);
+      throw new InternalServerErrorException('Failed to update verify');
     }
   }
 }

@@ -8,4 +8,6 @@ export class VerifyDto implements Omit<CreateVerifyDto, "email"> {
   did: CreateVerifyDto["did"];
   vpHash: CreateVerifyDto["vpHash"];
   verified: CreateVerifyDto["verified"];
+  handler: CreateVerifyDto["handler"];
+  metadata: CreateVerifyDto["metadata"];
 }
