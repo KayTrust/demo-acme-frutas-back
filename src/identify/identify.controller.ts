@@ -52,10 +52,9 @@ export class IdentifyController {
 
   @Get()
   @Public()
-  @Render('qr-identify')
   async getIdentifyPage(
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     const sessionIdentity = this.getSessionIdentity(req);
     if (sessionIdentity) {
@@ -65,7 +64,7 @@ export class IdentifyController {
     const callbackUrl = relativeSiteUrl(req, `cb`);
     const siopUri = this.identifyService.buildSiopRequestUri(state, callbackUrl);
     const qrCode = await this.identifyService.generateQrSvg(siopUri);
-    return { qrCode, sessionId: state };
+    return res.render('qr-identify', { qrCode, sessionId: state });
   }
 
   @Get('refresh')
@@ -112,16 +111,15 @@ export class IdentifyController {
 
   @Get('success')
   @Public()
-  @Render('qr-success')
   async successPage(
     @Query('hash') hash: string,
     @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+    @Res() res: Response,
   ) {
     if (!hash) {
       const sessionIdentity = this.getSessionIdentity(req);
       if (sessionIdentity) {
-        return { name: sessionIdentity.name, redirectUrl: undefined };
+        return res.render('qr-success', { name: sessionIdentity.name, redirectUrl: undefined });
       } else {
         return res.redirect(relativeUrl(req, '..'));
       }
@@ -138,12 +136,8 @@ export class IdentifyController {
 
     await this.verifierService.update(verify.id, { metadata: { ...verify.metadata, unused: false } });
 
-    // Set session cookie to register the identified user
     this.setSessionIdentity(req, identity);
 
-    // const redirectUrl = this.configService.get('FRONTEND_BASE_URL', { infer: true }) || null;
-    // return res.redirect(relativeUrl(req, '..'));
-
-    return { name: identity.name, redirectUrl: relativeSiteUrl(req, `../success`) };
+    return res.render('qr-success', { name: identity.name, redirectUrl: relativeSiteUrl(req, `../success`) });
   }
 }
