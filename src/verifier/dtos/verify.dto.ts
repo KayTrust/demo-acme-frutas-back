@@ -3,6 +3,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { CreateVerifyDto } from './create-verify.dto';
 
 export class VerifyDto implements Omit<CreateVerifyDto, "email"> {
+  id: string;
   name: CreateVerifyDto["name"];
   did: CreateVerifyDto["did"];
   vpHash: CreateVerifyDto["vpHash"];

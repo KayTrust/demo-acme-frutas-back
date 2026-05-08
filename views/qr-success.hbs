@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KayWallet – Identificación Exitosa</title>
+  {{#if redirectUrl}}
+  <meta http-equiv="refresh" content="5;url={{redirectUrl}}">
+  {{/if}}
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #c6c6cd;
+      border-radius: 8px;
+      padding: 40px 32px;
+      box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.08);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0b1c30;
+      letter-spacing: 0.01em;
+    }
+    .logo-icon {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .logo-icon-bg {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      top: 5px;
+      left: 5px;
+      background: rgba(78, 222, 163, 0.25);
+      border-radius: 50%;
+    }
+    .logo-icon svg {
+      position: relative;
+      z-index: 1;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: #0b1c30;
+    }
+    .welcome-text {
+      font-size: 16px;
+      color: #45464d;
+      margin-bottom: 24px;
+      line-height: 24px;
+    }
+    .welcome-text strong { color: #0b1c30; }
+    .success-box {
+      background: #f0fdf8;
+      border-left: 3px solid #009668;
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+    .success-box-icon { color: #009668; flex-shrink: 0; margin-top: 1px; }
+    .success-box-title { font-size: 14px; font-weight: 600; color: #0b1c30; margin-bottom: 4px; }
+    .success-box-text  { font-size: 14px; color: #45464d; line-height: 20px; }
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 14px 24px;
+      background-color: #0051d5;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      margin-bottom: 14px;
+      transition: background-color 0.15s;
+    }
+    .btn-primary:hover { background-color: #003ea8; }
+    .redirect-note {
+      font-size: 13px;
+      color: #76777d;
+      margin-top: 4px;
+    }
+    .redirect-note strong { color: #0051d5; }
+    footer {
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e5eeff;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .footer-brand { font-size: 14px; font-weight: 600; color: #0b1c30; }
+    .footer-legal  { font-size: 12px; color: #76777d; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <div class="logo-wrapper">
+        <p class="logo-text">KayWallet</p>
+        <div class="logo-icon">
+          <div class="logo-icon-bg"></div>
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <text x="6" y="52" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="34" fill="#009668">KAY</text>
+            <rect x="54" y="28" width="22" height="15" rx="3" fill="#009668"/>
+            <rect x="54" y="33" width="22" height="8" rx="1" fill="#f0fdf8"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1>¡Identificación<br>Exitosa!</h1>
+      <p class="welcome-text">Bienvenido de nuevo, <strong>{{name}}</strong></p>
+
+      <div class="success-box">
+        <svg class="success-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+        </svg>
+        <div>
+          <p class="success-box-title">Sesión Asegurada</p>
+          <p class="success-box-text">Su identidad ha sido verificada mediante protocolos criptográficos avanzados de KayWallet.</p>
+        </div>
+      </div>
+
+      {{#if redirectUrl}}
+        <a href="{{redirectUrl}}" class="btn-primary">Ir al Dashboard Principal</a>
+        <p class="redirect-note">Redirigiendo automáticamente en <strong id="countdown">5 segundos…</strong></p>
+      {{else}}
+        <p class="welcome-text" style="margin-bottom:0">Tu sesión ha sido registrada correctamente.</p>
+      {{/if}}
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-brand">KayWallet</span>
+    <span class="footer-legal">© 2024 KayWallet. Member FDIC. Equal Housing Lender.</span>
+  </footer>
+
+  {{#if redirectUrl}}
+  <script>
+    (function () {
+      let seconds = 1;
+      const el = document.getElementById('countdown');
+      if (!el) return;
+      const interval = setInterval(function () {
+        seconds--;
+        el.textContent = seconds + (seconds === 1 ? ' segundo…' : ' segundos…');
+        if (seconds <= 0) {
+          clearInterval(interval);
+          window.location.href = '{{redirectUrl}}';
+        }
+      }, 1000);
+    })();
+  </script>
+  {{/if}}
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KayWallet – Identificación QR</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #000000;
+      padding: 16px 32px;
+    }
+    header span {
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+    .container {
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 44px;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: #0b1c30;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #45464d;
+      margin-bottom: 32px;
+      line-height: 24px;
+    }
+    .qr-card {
+      background: #ffffff;
+      border: 1px solid #c6c6cd;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.08);
+      margin-bottom: 20px;
+    }
+    .qr-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #fff;
+    }
+    .qr-wrapper svg {
+      width: 180px;
+      height: 180px;
+    }
+    .qr-placeholder {
+      width: 180px;
+      height: 180px;
+      background: #d3e4fe;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #45464d;
+      font-size: 14px;
+    }
+    .steps {
+      text-align: left;
+      list-style: none;
+      padding: 0;
+    }
+    .steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 10px;
+      color: #0b1c30;
+    }
+    .steps li .dot {
+      color: #0051d5;
+      font-size: 20px;
+      line-height: 18px;
+      flex-shrink: 0;
+    }
+    .info-box {
+      background: #eff4ff;
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .info-box-icon { color: #0051d5; flex-shrink: 0; margin-top: 2px; }
+    .info-box-title { font-size: 14px; font-weight: 600; color: #0b1c30; margin-bottom: 4px; }
+    .info-box-text  { font-size: 14px; color: #45464d; line-height: 20px; }
+    .security-badge {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #009668;
+      letter-spacing: 0.02em;
+    }
+    .trust-bar {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+      padding-bottom: 8px;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #45464d;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    footer {
+      background: #000000;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-brand { color: #ffffff; font-size: 14px; font-weight: 600; }
+    .footer-legal { color: #7c839b; font-size: 12px; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { color: #7c839b; font-size: 12px; text-decoration: none; }
+    .footer-links a:hover { color: #bec6e0; }
+
+    /* Waiting indicator */
+    .waiting-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #45464d;
+    }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid #c6c6cd;
+      border-top-color: #0051d5;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <header>
+    <span>KayWallet</span>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1>Identifícate de<br>forma segura</h1>
+      <p class="subtitle">Accede sin contraseñas, usando tu<br>dispositivo de confianza.</p>
+
+      <div class="qr-card">
+        <div class="qr-wrapper">
+          {{#if qrCode}}
+            {{{qrCode}}}
+          {{else}}
+            <div class="qr-placeholder">Generando QR…</div>
+          {{/if}}
+        </div>
+
+        <ul class="steps">
+          <li><span class="dot">•</span><span>Abre la aplicación <strong>KayWallet</strong> en tu teléfono móvil.</span></li>
+          <li><span class="dot">•</span><span>Pulsa el botón <strong>"Escanear QR"</strong> en la pantalla de inicio.</span></li>
+          <li><span class="dot">•</span><span>Apunta con la cámara hacia este código para entrar instantáneamente.</span></li>
+          <li><span class="dot">•</span><span>Selecciona y comparte tu credencial verificable de identidad emitida por tu entidad de confianza.</span></li>
+        </ul>
+
+        <div class="info-box">
+          <svg class="info-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+          <div>
+            <p class="info-box-title">Identificación digital</p>
+            <p class="info-box-text">Se te solicitará compartir una credencial verificable para completar tu identificación de forma segura.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="waiting-indicator" id="waiting-msg">
+        <span class="spinner"></span>
+        <span>Esperando identificación…</span>
+      </div>
+
+      <div class="security-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        Conexión segura
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-brand">KayWallet</span>
+    <span class="footer-legal">© 2026 KayWallet.</span>
+  </footer>
+
+  <!-- Socket.IO client served by the backend -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    (function () {
+      const SESSION_ID = '{{sessionId}}';
+
+      const socket = io({ transports: ['websocket', 'polling'] });
+
+      socket.on('connect', function () {
+        console.log('[Socket.IO] Connected, sessionId:', SESSION_ID);
+        socket.emit('join_session', SESSION_ID);
+      });
+
+      socket.on('vp_inserted', function (payload) {
+        console.log('[Socket.IO] vp_inserted:', payload);
+        if (payload && payload.vpHash) {
+          window.location.href = '/identify/success?hash=' + encodeURIComponent(payload.vpHash);
+        }
+      });
+
+      socket.on('disconnect', function () {
+        console.log('[Socket.IO] Connection closed');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import {JwtCredentialPayload, JwtPresentationPayload, ProofTypeJWT, VerifiedPresentation} from '@kaytrust/prooftypes'
+import {JwtCredentialPayload, JwtPresentationPayload, ProofTypeJWT} from '@kaytrust/prooftypes'
 import { getResolver, Resolver } from '@kaytrust/did-ethr';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
@@ -14,9 +14,12 @@ import { Verify } from './entities';
 import { VerifyDto } from './dtos/verify.dto';
 import { sanitizeVerify } from './helpers/sanitize-user';
 import { SocketService } from 'src/socket/services/socket.service';
-import { MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 import { getResolver as _getKeyResolver } from "@cef-ebsi/key-did-resolver";
 import { getEbsiResolver } from 'src/common/utils/ebsi-multienvironment-resolver';
+
+export interface EvalVpTokenOptions {
+  credentialTypes: string[];
+}
 
 @Injectable()
 export class VerifierService {
@@ -28,7 +31,7 @@ export class VerifierService {
         private readonly socketService: SocketService,
     ) {}
 
-    async evalVpToken(vp_token: string, xCorrelationId: string) {
+    async evalVpToken(vp_token: string, xCorrelationId: string, options: EvalVpTokenOptions, sessionId?: string): Promise<VerifyDto> {
         const network = this.configService.get("ethr.default_network", {infer: true});
         const networks = this.configService.get("ethr.networks", {infer: true});
         const resolver = new Resolver({...getResolver({...network, networks}), ...getNearResolver(this.configService), ..._getKeyResolver(), ...getEbsiResolver(this.configService.get("ebsi.registries", {infer: true}))});
@@ -42,7 +45,7 @@ export class VerifierService {
         const vp = payload.vp;
         const credential = [vp.verifiableCredential].flat().find((cred)=>{
           const cred_payload = jose.decodeJwt(cred as string) as JwtCredentialPayload
-          return [MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR].some((type)=>!!cred_payload.vc?.type.includes(type)) && !!cred_payload.vc?.type.includes('VerifiableCredential')
+          return options.credentialTypes.some((type)=>!!cred_payload.vc?.type.includes(type)) && !!cred_payload.vc?.type.includes('VerifiableCredential')
         })
         if (!credential) throw new VpEvalError(`VerifiableCredential, AcmeAccreditation not found (${xCorrelationId})`);
 
@@ -70,7 +73,7 @@ export class VerifierService {
 
         const verifyDto = await this.create(createDto);
 
-        this.socketService.vpInserted(verifyDto);
+        this.socketService.vpInserted(verifyDto, sessionId);
     
         return verifyDto;
     }
@@ -99,6 +102,35 @@ export class VerifierService {
         error.stack,
       );
       throw new InternalServerErrorException(error);
+    }
+  }
+
+  async findOne(id: string): Promise<VerifyDto | null> {
+    try {
+      if (!id) {
+        this.logger.warn('No id provided for findOne');
+        return null;
+      }
+      const verify = await this.verifyRepository.findOne({ where: { id } });
+      return verify ? sanitizeVerify(verify) : null;
+    } catch (error) {
+      this.logger.error(`Failed to find verify ${id}: ${error.message}`, error.stack);
+      return null;
+    }
+  }
+
+  async findHash(hash: string): Promise<VerifyDto | null> {
+    try {
+      this.logger.log(`Finding verify with hash: ${hash}`);
+      if (!hash) {
+        this.logger.warn('No hash provided for findHash');
+        return null;
+      }
+      const verify = await this.verifyRepository.findOne({ where: { vpHash: hash } });
+      return verify ? sanitizeVerify(verify) : null;
+    } catch (error) {
+      this.logger.error(`Failed to find verify with hash ${hash}: ${error.message}`, error.stack);
+      return null;
     }
   }
 }

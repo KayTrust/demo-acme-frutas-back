@@ -8,6 +8,7 @@ import { DEFAULT_APP_NAME } from './configs/constants';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as path from 'path';
 import * as fs from 'fs';
+import session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -34,6 +35,17 @@ async function bootstrap() {
   );
 
   const IS_PROD = configService.get("IS_PRODUCTION", { infer: true });
+
+  app.use(session({
+    secret: configService.getOrThrow('SESSION_SECRET', { infer: true }),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: IS_PROD,
+      maxAge: 60 * 60 * 1000, // 1 hour
+    },
+  }));
 
   app.setBaseViewsDir(path.join(__dirname, IS_PROD ? "." : "..", 'views'));
   app.setViewEngine('hbs');

@@ -5,6 +5,7 @@ import didsConfig from './dids.config';
 import openidConfig from './openid.config';
 import serverConfig from './server.config';
 import versionConfig from './version.config';
+import sessionConfig from './session.config';
 
 export const CONFIGS_LIST_FOR_LOAD = [
   serverConfig,
@@ -14,6 +15,7 @@ export const CONFIGS_LIST_FOR_LOAD = [
   keycloackConfig,
   frontendConfig,
   didsConfig,
+  sessionConfig,
 ];
 
 export type ConfigEnvVars = UnionToIntersection<

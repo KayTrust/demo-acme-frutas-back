@@ -11,6 +11,7 @@ import { SocketModule } from 'src/socket/socket.module';
     SocketModule,
   ],
   controllers: [VerifierController],
-  providers: [VerifierService]
+  providers: [VerifierService],
+  exports: [VerifierService],
 })
 export class VerifierModule {}

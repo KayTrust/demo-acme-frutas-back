@@ -17,6 +17,7 @@ import { LoggerModule } from './logger/logger.module';
 import { CustomLoggerService } from './logger/custom-logger.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './logger/logger.interceptor';
+import { IdentifyModule } from './identify/identify.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { LoggingInterceptor } from './logger/logger.interceptor';
     AuthModule,
     IssuerModule,
     VerifierModule,
+    IdentifyModule,
     SocketModule,
   ],
   controllers: [AppController],

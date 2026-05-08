@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { ConfigEnvVars } from 'src/configs';
 import { util as utilKeyDidResolver } from "@cef-ebsi/key-did-resolver";
 import { createJWKFromPrivateKey, CreateJwkFromWalletOptions } from "@kaytrust/openid4vci";
+import { join } from 'path';
 
 export const concatRoutes = (...routes: string[]) => {
   return (
@@ -18,8 +19,26 @@ export const concatRoutes = (...routes: string[]) => {
 };
 
 export function siteUrl(req: Request, ...routes: string[]) {
-  const protocol = (req as ForceProtocolHttps<Request>).force_protocol_https ? 'https' : req.protocol;
+  let protocol = req.protocol;
+  if ((req as ForceProtocolHttps<Request>).force_protocol_https) {
+    protocol += 's';
+  }
   return `${protocol}://${req.host}` + concatRoutes(req.baseUrl, ...routes);
+}
+
+export function relativeUrl(req: Request, ...routes: string[]) {
+  return join(req.url, ...routes);
+}
+
+export function relativeWithBase(req: Request, base: string, ...routes: string[]) {
+  const current_route = relativeUrl(req, ...routes);
+  base = (base || "").replace(/\/+$/g, "")
+  return base + current_route;
+}
+
+export function relativeSiteUrl(req: Request, ...routes: string[]) {
+  const current_route = relativeUrl(req, ...routes);
+  return siteUrl(req, current_route);
 }
 
 export function generarHash(texto: string, algoritmo = 'sha256') {

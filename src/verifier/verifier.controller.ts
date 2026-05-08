@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
 import { v4 as uuid } from 'uuid'
 import { Public } from 'src/auth/decorators/public-auth.decorator';
+import { MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR } from 'src/configs/constants';
 
 @Controller('verifier')
 export class VerifierController {
@@ -25,6 +26,8 @@ export class VerifierController {
     const defaultFrontendBase = this.configService.get("FRONTEND_BASE_URL", { infer: true });
     const baseUrl = (base || defaultFrontendBase).replace(/\/+$/g, "")
     path = path.replace(/^\/+/g, "")
+    console.log("getRedirectUri.baseUrl: " + baseUrl);
+    console.log("getRedirectUri.path: " + path);
     return `${baseUrl}/${path}`
   }
 
@@ -39,7 +42,9 @@ export class VerifierController {
     try {
       this.logger.log("recieveCredential.req: " + xCorrelationId + " - " + JSON.stringify(query));
 
-      const verifierDto = await this.verifierService.evalVpToken(query.vp_token, xCorrelationId);
+      const verifierDto = await this.verifierService.evalVpToken(query.vp_token, xCorrelationId, {
+        credentialTypes: [MELON_VC_TYPE_BASE, MELON_VC_TYPE_ETHR, MELON_VC_TYPE_NEAR]
+      });
       this.logger.log("validated_token: " + xCorrelationId + " - " + JSON.stringify(query.vp_token));
       return { url: this.getRedirectUri('/congrats?close=1'), statusCode: 302 };
     } catch (error) {
