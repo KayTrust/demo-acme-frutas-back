@@ -32,7 +32,13 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     @ConnectedSocket() socket: Socket,
     @MessageBody() sessionId: string,
   ): void {
+    const previousSession = this.socketService.getActiveSession(socket.id);
+    if (previousSession) {
+      socket.leave(previousSession);
+      this.logger.log(`Client ${socket.id} left session room: ${previousSession}`);
+    }
     socket.join(sessionId);
+    this.socketService.setActiveSession(socket.id, sessionId);
     this.logger.log(`Client ${socket.id} joined session room: ${sessionId}`);
   }
 }

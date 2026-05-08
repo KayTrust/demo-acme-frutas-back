@@ -68,6 +68,16 @@ export class IdentifyController {
     return { qrCode, sessionId: state };
   }
 
+  @Get('refresh')
+  @Public()
+  async refreshQr(@Req() req: Request) {
+    const state = uuid();
+    const callbackUrl = relativeSiteUrl(req, `../cb`);
+    const siopUri = this.identifyService.buildSiopRequestUri(state, callbackUrl);
+    const qrCode = await this.identifyService.generateQrSvg(siopUri);
+    return { sessionId: state, qrCode };
+  }
+
   @Get('cb')
   @Public()
   @Redirect()

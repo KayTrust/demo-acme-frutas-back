@@ -6,6 +6,7 @@ import { VerifyDto } from 'src/verifier/dtos/verify.dto';
 export class SocketService {
   private server: Server;
   private readonly connectedClients: Map<string, Socket> = new Map();
+  private readonly socketSession: Map<string, string> = new Map(); // socketId → sessionId
   private readonly logger = new Logger('SocketService');
 
   setServer(server: Server): void {
@@ -24,6 +25,14 @@ export class SocketService {
     // Handle other events and messages from the client
   }
 
+  getActiveSession(socketId: string): string | undefined {
+    return this.socketSession.get(socketId);
+  }
+
+  setActiveSession(socketId: string, sessionId: string): void {
+    this.socketSession.set(socketId, sessionId);
+  }
+
   vpInserted(verify: VerifyDto, sessionId?: string) {
     if (sessionId && this.server) {
       this.server.to(sessionId).emit('vp_inserted', verify);
@@ -36,9 +45,11 @@ export class SocketService {
 
   deleteAll() {
     this.connectedClients.clear();
+    this.socketSession.clear();
   }
 
   delete(id: string) {
     this.connectedClients.delete(id);
+    this.socketSession.delete(id);
   }
 }

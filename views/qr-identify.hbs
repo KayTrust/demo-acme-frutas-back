@@ -174,6 +174,50 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* QR refresh overlay */
+    .qr-wrapper {
+      position: relative;
+    }
+    .qr-refresh-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 4px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+      color: #45464d;
+    }
+    .qr-refresh-overlay.active { display: flex; }
+    .qr-refresh-overlay .spinner { width: 20px; height: 20px; }
+
+    /* Countdown badge */
+    .qr-countdown {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #7c839b;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      justify-content: center;
+    }
+    .qr-countdown-bar {
+      width: 80px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .qr-countdown-bar-fill {
+      height: 100%;
+      background: #0051d5;
+      border-radius: 99px;
+      transition: width 1s linear;
+    }
   </style>
 </head>
 <body>
@@ -187,12 +231,25 @@
       <p class="subtitle">Accede sin contraseñas, usando tu<br>dispositivo de confianza.</p>
 
       <div class="qr-card">
-        <div class="qr-wrapper">
-          {{#if qrCode}}
-            {{{qrCode}}}
-          {{else}}
-            <div class="qr-placeholder">Generando QR…</div>
-          {{/if}}
+        <div class="qr-wrapper" id="qr-wrapper">
+          <div id="qr-container">
+            {{#if qrCode}}
+              {{{qrCode}}}
+            {{else}}
+              <div class="qr-placeholder">Generando QR…</div>
+            {{/if}}
+          </div>
+          <div class="qr-refresh-overlay" id="qr-overlay">
+            <div class="spinner"></div>
+            <span>Actualizando QR…</span>
+          </div>
+        </div>
+
+        <div class="qr-countdown" id="qr-countdown">
+          <span id="qr-countdown-text">Actualiza en 30s</span>
+          <div class="qr-countdown-bar">
+            <div class="qr-countdown-bar-fill" id="qr-countdown-fill" style="width:100%"></div>
+          </div>
         </div>
 
         <ul class="steps">
@@ -234,13 +291,23 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     (function () {
-      const SESSION_ID = '{{sessionId}}';
+      const QR_TTL = 60; // segundos entre rotaciones
 
+      let currentSessionId = '{{sessionId}}';
+      let countdown = QR_TTL;
+      let countdownInterval = null;
+
+      const qrContainer  = document.getElementById('qr-container');
+      const qrOverlay    = document.getElementById('qr-overlay');
+      const countdownTxt = document.getElementById('qr-countdown-text');
+      const countdownBar = document.getElementById('qr-countdown-fill');
+
+      // ---------- Socket ----------
       const socket = io({ transports: ['websocket', 'polling'] });
 
       socket.on('connect', function () {
-        console.log('[Socket.IO] Connected, sessionId:', SESSION_ID);
-        socket.emit('join_session', SESSION_ID);
+        console.log('[Socket.IO] Connected, sessionId:', currentSessionId);
+        socket.emit('join_session', currentSessionId);
       });
 
       socket.on('vp_inserted', function (payload) {
@@ -253,6 +320,52 @@
       socket.on('disconnect', function () {
         console.log('[Socket.IO] Connection closed');
       });
+
+      // ---------- QR rotation ----------
+      function updateCountdownUI() {
+        const pct = (countdown / QR_TTL) * 100;
+        countdownBar.style.width = pct + '%';
+        countdownTxt.textContent = 'Actualiza en ' + countdown + 's';
+      }
+
+      function startCountdown() {
+        clearInterval(countdownInterval);
+        countdown = QR_TTL;
+        updateCountdownUI();
+        countdownInterval = setInterval(function () {
+          countdown -= 1;
+          updateCountdownUI();
+          if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            rotateQr();
+          }
+        }, 1000);
+      }
+
+      async function rotateQr() {
+        qrOverlay.classList.add('active');
+        try {
+          const resp = await fetch('/identify/refresh');
+          if (!resp.ok) throw new Error('refresh failed');
+          const data = await resp.json();
+
+          // Update QR display
+          qrContainer.innerHTML = data.qrCode;
+
+          // Switch socket room
+          socket.emit('join_session', data.sessionId);
+          currentSessionId = data.sessionId;
+          console.log('[QR] Rotated to session:', currentSessionId);
+        } catch (err) {
+          console.error('[QR] Rotation error:', err);
+        } finally {
+          qrOverlay.classList.remove('active');
+          startCountdown();
+        }
+      }
+
+      // Start countdown once the page loads
+      startCountdown();
     })();
   </script>
 </body>
