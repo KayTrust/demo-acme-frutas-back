@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KayWallet – Identificación Fallida</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background-color: #f8f9ff;
+      color: #0b1c30;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #c6c6cd;
+      border-radius: 8px;
+      padding: 40px 32px;
+      box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.08);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    .logo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0b1c30;
+      letter-spacing: 0.01em;
+    }
+    .logo-icon {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .logo-icon-bg {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      top: 5px;
+      left: 5px;
+      background: rgba(220, 38, 38, 0.12);
+      border-radius: 50%;
+    }
+    .logo-icon svg { position: relative; z-index: 1; }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: #0b1c30;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #45464d;
+      margin-bottom: 24px;
+      line-height: 24px;
+    }
+    .error-box {
+      background: #fff5f5;
+      border-left: 3px solid #dc2626;
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      text-align: left;
+      margin-bottom: 28px;
+    }
+    .error-box-icon { color: #dc2626; flex-shrink: 0; margin-top: 1px; }
+    .error-box-title { font-size: 14px; font-weight: 600; color: #0b1c30; margin-bottom: 4px; }
+    .error-box-text  { font-size: 14px; color: #45464d; line-height: 20px; }
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 14px 24px;
+      background-color: #0051d5;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.15s;
+    }
+    .btn-primary:hover { background-color: #003ea8; }
+    footer {
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e5eeff;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .footer-brand { font-size: 14px; font-weight: 600; color: #0b1c30; }
+    .footer-legal  { font-size: 12px; color: #76777d; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <div class="logo-wrapper">
+        <p class="logo-text">KayWallet</p>
+        <div class="logo-icon">
+          <div class="logo-icon-bg"></div>
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <text x="6" y="52" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="34" fill="#dc2626">KAY</text>
+            <rect x="54" y="28" width="22" height="15" rx="3" fill="#dc2626"/>
+            <rect x="54" y="33" width="22" height="8" rx="1" fill="#fff5f5"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1>Identificación<br>Fallida</h1>
+      <p class="subtitle">{{#if reason}}{{reason}}{{else}}No fue posible verificar tu identidad.{{/if}}</p>
+
+      <div class="error-box">
+        <svg class="error-box-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <div>
+          <p class="error-box-title">Verificación no completada</p>
+          <p class="error-box-text">La credencial no pudo ser validada o el enlace ya fue utilizado. Por favor, inténtalo de nuevo escaneando un nuevo código QR.</p>
+        </div>
+      </div>
+
+      <a href="/identify" class="btn-primary">Volver a intentarlo</a>
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-brand">KayWallet</span>
+    <span class="footer-legal">© 2026 KayWallet.</span>
+  </footer>
+</body>
+</html>

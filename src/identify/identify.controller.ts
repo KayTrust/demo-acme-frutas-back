@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Query, Redirect, Render, Req, Res } from '@nestjs/common';
+import { Controller, Get, Logger, Query, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
@@ -9,6 +9,7 @@ import { VerifierService } from 'src/verifier/verifier.service';
 import { SharedVpDto } from 'src/verifier/dtos/share-vp.dto';
 import { relativeSiteUrl, relativeUrl, relativeWithBase, siteUrl } from 'src/common/utils/functions';
 import { SessionIdentity } from './interfaces/session-identity.interface';
+import { SessionRegistryService } from 'src/session/session-registry.service';
 
 @Controller('identify')
 export class IdentifyController {
@@ -18,6 +19,7 @@ export class IdentifyController {
     private readonly identifyService: IdentifyService,
     private readonly verifierService: VerifierService,
     private readonly configService: ConfigService<ConfigEnvVars, true>,
+    private readonly sessionRegistry: SessionRegistryService,
   ) {}
 
   private getServerBaseUrl(req: Request): string {
@@ -60,45 +62,74 @@ export class IdentifyController {
     if (sessionIdentity) {
       return res.redirect(relativeUrl(req, 'success'));
     }
-    const state = uuid();
+    const state = await this.identifyService.generateSessionId();
     const callbackUrl = relativeSiteUrl(req, `cb`);
     const siopUri = this.identifyService.buildSiopRequestUri(state, callbackUrl);
     const qrCode = await this.identifyService.generateQrSvg(siopUri);
-    return res.render('qr-identify', { qrCode, sessionId: state });
+    return res.render('qr-identify', { qrCode, sessionId: state, SESSION_TTL_MS: this.configService.get('SESSION_TTL_MS', { infer: true }) });
   }
 
   @Get('refresh')
   @Public()
-  async refreshQr(@Req() req: Request) {
-    const state = uuid();
+  async refreshQr(
+    @Query('prevSessionId') prevSessionId: string,
+    @Req() req: Request,
+  ) {
+    const state = await this.identifyService.updateSessionId(prevSessionId);
     const callbackUrl = relativeSiteUrl(req, `../cb`);
     const siopUri = this.identifyService.buildSiopRequestUri(state, callbackUrl);
     const qrCode = await this.identifyService.generateQrSvg(siopUri);
     return { sessionId: state, qrCode };
   }
 
+  @Get('failed')
+  @Public()
+  async failedPage(
+    @Query('reason') reason: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const sessionIdentity = this.getSessionIdentity(req);
+    if (sessionIdentity) {
+      return res.redirect(relativeUrl(req, 'success'));
+    }
+    return res.render('qr-failed', { reason });
+  }
+
   @Get('cb')
   @Public()
-  @Redirect()
   async receiveVpToken(
     @Req() req: Request,
+    @Res() res: Response,
     @Query() query: SharedVpDto,
   ) {
     const xCorrelationId = uuid();
     try {
       this.logger.log(`identify.cb [${xCorrelationId}]: ${JSON.stringify(query)}`);
+
+      const sessionExists = await this.identifyService.verifySessionExists(query.state);
+      if (!sessionExists) {
+        this.logger.warn(`identify.cb [${xCorrelationId}]: Session ${query.state} does not exist`);
+        return res.redirect(relativeUrl(req, `../failed?reason=${encodeURIComponent('Session not found')}`));
+      }
+
       const verifyDto = await this.verifierService.evalVpToken(query.vp_token, xCorrelationId, {
         credentialTypes: ['NameAttestation'],
         handler: 'identify',
         metadata: { unused: true },
       }, query.state);
 
-      this.setSessionIdentity(req, verifyDto);
+      // Invalidar la sesión para que no pueda ser reutilizada
+      this.sessionRegistry.remove(query.state);
 
-      return { url: relativeSiteUrl(req, `../success`), statusCode: 302 };
+      // this.setSessionIdentity(req, verifyDto);
+
+      const params = new URLSearchParams({ name: verifyDto.name.trim().split(' ')[0] });
+
+      return res.redirect(relativeUrl(req, `../success-send`) + `?${params.toString()}`);
     } catch (error) {
       this.logger.error(`identify.cb error [${xCorrelationId}]:`, error);
-      return { url: relativeSiteUrl(req, `../failed`), statusCode: 302 };
+      return res.redirect(relativeUrl(req, `../failed`));
     }
   }
 
@@ -107,6 +138,16 @@ export class IdentifyController {
     (req as any).session.userId = identity.id;
     (req as any).session.userName = identity.name;
     (req as any).session.did = identity.did;
+  }
+
+  @Get('success-send')
+  @Public()
+  async successSendPage(
+    @Query('name') name: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    return res.render('qr-success', { name, redirectUrl: null });
   }
 
   @Get('success')

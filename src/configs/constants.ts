@@ -4,3 +4,11 @@ export const MELON_VC_TYPE_BASE = "AcmeAccreditation"
 export const MELON_VC_TYPE_ETHR = "AcmeAccreditationEthr"
 export const MELON_VC_TYPE_NEAR= "AcmeAccreditationNear"
 export const MELON_VC_TYPE_KEY= "AcmeAccreditationKey"
+
+
+
+
+// Session management constants
+
+export const SESSION_TTL_MS_DEFAULT = 60 * 1_000; // 1 minuto
+export const CLEANUP_INTERVAL_MS_DEFAULT = 60 * 1_000; // limpiar cada minuto

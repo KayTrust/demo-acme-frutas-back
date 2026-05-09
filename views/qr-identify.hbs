@@ -291,7 +291,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     (function () {
-      const QR_TTL = 60; // segundos entre rotaciones
+      const QR_TTL = parseInt({{SESSION_TTL_MS}} / 1000); // segundos entre rotaciones
 
       let currentSessionId = '{{sessionId}}';
       let countdown = QR_TTL;
@@ -307,7 +307,12 @@
 
       socket.on('connect', function () {
         console.log('[Socket.IO] Connected, sessionId:', currentSessionId);
-        socket.emit('join_session', currentSessionId);
+        socket.emit('join_session', currentSessionId, function (ack) {
+          if (ack && !ack.success) {
+            console.warn('[Socket.IO] Session rejected by server, rotating QR…');
+            rotateQr();
+          }
+        });
       });
 
       socket.on('vp_inserted', function (payload) {
@@ -353,7 +358,11 @@
           qrContainer.innerHTML = data.qrCode;
 
           // Switch socket room
-          socket.emit('join_session', data.sessionId);
+          socket.emit('join_session', data.sessionId, function (ack) {
+            if (ack && !ack.success) {
+              console.warn('[QR] Server rejected new session room:', data.sessionId);
+            }
+          });
           currentSessionId = data.sessionId;
           console.log('[QR] Rotated to session:', currentSessionId);
         } catch (err) {

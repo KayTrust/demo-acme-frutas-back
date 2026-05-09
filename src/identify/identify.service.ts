@@ -1,6 +1,7 @@
 import { ResponseMode, ResponseType } from '@kaytrust/openid4vci';
 import { Injectable } from '@nestjs/common';
 import * as qrcode from 'qrcode';
+import { SessionRegistryService } from 'src/session/session-registry.service';
 
 export interface BuildSiopRequestUriOptions {
   response_mode?: ResponseMode;
@@ -9,17 +10,25 @@ export interface BuildSiopRequestUriOptions {
 
 @Injectable()
 export class IdentifyService {
-  /**
-   * Generates an SVG string for the given content (SIOP request URI).
-   */
+
+  constructor(private readonly sessionRegistry: SessionRegistryService) {}
+
   async generateQrSvg(content: string): Promise<string> {
     return qrcode.toString(content, { type: 'svg', margin: 2 });
   }
 
-  /**
-   * Builds a minimal OpenID4VP authorization request URI that KayWallet
-   * will resolve. The wallet must POST/GET the vp_token to `redirectUri`.
-   */
+  generateSessionId(): string {
+    return this.sessionRegistry.create();
+  }
+
+  verifySessionExists(sessionId: string): boolean {
+    return this.sessionRegistry.exists(sessionId);
+  }
+
+  updateSessionId(prevSessionId?: string): string {
+    return this.sessionRegistry.rotate(prevSessionId);
+  }
+
   buildSiopRequestUri(
     state: string, redirectUri: string, options: BuildSiopRequestUriOptions = {}
   ): string {
