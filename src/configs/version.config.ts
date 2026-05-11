@@ -1,4 +1,4 @@
 
 export default () => ({
-  APP_VERSION: "0.5.2"
+  APP_VERSION: "0.5.3"
 })
