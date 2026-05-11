@@ -8,6 +8,13 @@ import { util as utilKeyDidResolver } from "@cef-ebsi/key-did-resolver";
 import { createJWKFromPrivateKey, CreateJwkFromWalletOptions } from "@kaytrust/openid4vci";
 import { join } from 'path';
 
+export function parseBoolean(value: string | boolean | undefined | null): boolean {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'boolean') return value;
+  const str = value.toLowerCase().trim();
+  return str === 'true' || !!parseInt(str);
+}
+
 export const concatRoutes = (...routes: string[]) => {
   return (
     '/' +

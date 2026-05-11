@@ -36,9 +36,13 @@ async function bootstrap() {
 
   const IS_PROD = configService.get("IS_PRODUCTION", { infer: true });
 
-  if (IS_PROD) {
+  const NO_TRUST_PROXY = configService.get("NO_TRUST_PROXY", { infer: true });
+
+  if (IS_PROD && !NO_TRUST_PROXY) {
     app.set('trust proxy', 1);
   }
+
+  const NO_SECURE_SESSION = configService.get('NO_SECURE_SESSION', { infer: true });
 
   app.use(session({
     secret: configService.getOrThrow('SESSION_SECRET', { infer: true }),
@@ -46,12 +50,17 @@ async function bootstrap() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: IS_PROD,
+      secure: IS_PROD && !NO_SECURE_SESSION,
       maxAge: 60 * 60 * 1000, // 1 hour
     },
   }));
 
-  app.setBaseViewsDir(path.join(__dirname, IS_PROD ? "." : "..", 'views'));
+  let viewsDir = path.join(".", 'views');
+  if (!fs.existsSync(viewsDir)) {
+    viewsDir = path.join("..", 'views');
+  }
+
+  app.setBaseViewsDir(viewsDir);
   app.setViewEngine('hbs');
 
   const OpenAPIOptions = new DocumentBuilder()
