@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Logger, Query, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ConfigEnvVars } from 'src/configs';
@@ -140,6 +140,17 @@ export class IdentifyController {
     (req as any).session.did = identity.did;
   }
 
+  @Post('logout')
+  @Public()
+  async logout(@Req() req: Request, @Res() res: Response) {
+    if ((req as any).session) {
+      delete (req as any).session.userId;
+      delete (req as any).session.userName;
+      delete (req as any).session.did;
+    }
+    return res.redirect(relativeUrl(req, '..'));
+  }
+
   @Get('success-send')
   @Public()
   async successSendPage(
@@ -147,7 +158,7 @@ export class IdentifyController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    return res.render('qr-success', { name, redirectUrl: null });
+    return res.render('qr-success', { name, redirectUrl: null, hideLogout: true });
   }
 
   @Get('success')

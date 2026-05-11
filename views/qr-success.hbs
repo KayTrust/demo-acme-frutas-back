@@ -111,6 +111,23 @@
       transition: background-color 0.15s;
     }
     .btn-primary:hover { background-color: #003ea8; }
+    .btn-logout {
+      display: block;
+      width: 100%;
+      padding: 12px 24px;
+      background-color: transparent;
+      color: #76777d;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid #c6c6cd;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      margin-top: 12px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-logout:hover { border-color: #0051d5; color: #0051d5; }
     .redirect-note {
       font-size: 13px;
       color: #76777d;
@@ -163,6 +180,11 @@
         <p class="redirect-note">Redirigiendo automáticamente en <strong id="countdown">5 segundos…</strong></p>
       {{else}}
         <p class="welcome-text" style="margin-bottom:0">Tu sesión ha sido registrada correctamente.</p>
+        {{#unless hideLogout}}
+        <form method="POST" action="logout" style="margin-top:12px">
+          <button type="submit" class="btn-logout">Cerrar sesión</button>
+        </form>
+        {{/unless}}
       {{/if}}
     </div>
   </main>
