@@ -36,6 +36,10 @@ async function bootstrap() {
 
   const IS_PROD = configService.get("IS_PRODUCTION", { infer: true });
 
+  if (IS_PROD) {
+    app.set('trust proxy', 1);
+  }
+
   app.use(session({
     secret: configService.getOrThrow('SESSION_SECRET', { infer: true }),
     resave: false,
