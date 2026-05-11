@@ -55,9 +55,9 @@ async function bootstrap() {
     },
   }));
 
-  let viewsDir = path.join(".", 'views');
+  let viewsDir = path.join(__dirname, 'views');
   if (!fs.existsSync(viewsDir)) {
-    viewsDir = path.join("..", 'views');
+    viewsDir = path.join(__dirname, '..', 'views');
   }
 
   app.setBaseViewsDir(viewsDir);
