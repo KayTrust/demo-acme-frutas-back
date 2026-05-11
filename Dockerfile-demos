@@ -1,1 +1,1 @@
-FROM ghcr.io/kaytrust/demo-acme-frutas-back:0.5.2
+FROM ghcr.io/kaytrust/demo-acme-frutas-back:0.5.3
