@@ -16,7 +16,7 @@ jobs:
       - name: Delete untagged versions
         uses: actions/delete-package-versions@v5
         with:
-          package-name: vaults-gauntlet-front
+          package-name: ${{ github.event.repository.name }}
           package-type: container
           delete-only-untagged-versions: true
           token: ${{ secrets.GITHUB_TOKEN }}
