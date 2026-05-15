@@ -165,7 +165,7 @@ export class IssuerController {
     try {
       response = {
         format: request.format,
-        credential: await createJWT(did_method_issuer, {privateKey, jwk}, payload, {audience: payload.iss, is_presentation: false, no_vc_vp: no_vc_vp}),
+        credential: await createJWT('ethr', {privateKey, jwk}, payload, {audience: payload.iss, is_presentation: false, no_vc_vp: no_vc_vp}),
       };
     } catch (error) {
       this.logger.error(error)
